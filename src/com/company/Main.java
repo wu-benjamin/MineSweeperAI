@@ -13,13 +13,13 @@ public class Main extends JPanel implements Runnable {
     // Ensure WIDTH >= HEIGHT for cleaner display;
     // Display is cleaner when WINDOW_SIZE is a multiple of WIDTH
     // WIDTH, HEIGHT, AND NUM_MINES used only when not in TEST mode (TEST = false to work)
-    private static final int WIDTH = 9;
-    private static final int HEIGHT = 9;
-    private static final int NUM_MINES = 10;
+    private static final int WIDTH = 16;
+    private static final int HEIGHT = 16;
+    private static final int NUM_MINES = 40;
     private static final int WINDOW_SIZE = 600;
     private static JFrame frame = new JFrame("MineSweeper");
     private static Main panel = new Main();
-    private static final boolean TEST = false;
+    private static final boolean TEST = true;
     private static final int ITERATIONS = 1000;
     private static ArrayList<TestConditions> tests = new ArrayList<TestConditions>();
 
@@ -31,8 +31,8 @@ public class Main extends JPanel implements Runnable {
         tests.add(new TestConditions(9, 9, 10));
         tests.add(new TestConditions(8, 8, 10));
         tests.add(new TestConditions(16, 16, 40));
-        tests.add(new TestConditions(24, 24, 99));
-        tests.add(new TestConditions(30, 16, 99));
+        //tests.add(new TestConditions(24, 24, 99));
+        //tests.add(new TestConditions(30, 16, 99));
     }
 
     public void run() {

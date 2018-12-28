@@ -9,10 +9,10 @@ public class AI {
     private static final double EPSILON = 0.00000000001;
     private static boolean[][] suspectedMine;
     private static double[][] probabilityMine;
-    private static final boolean STEP_BY_STEP = true;
-    private static final boolean AUTO = false;
+    private static final boolean STEP_BY_STEP = false;
+    private static final boolean AUTO = true;
     private static final boolean DISCARD_DEATH_TURN_ONE = true;
-    private static final int AUTO_TIME = 1000;
+    private static final int AUTO_TIME = 100;
     private static final int PREFERRED_COORDINATE = 3;
     private static double newProbability;
     private static double lowestProb;
@@ -23,7 +23,8 @@ public class AI {
     private static ArrayList<Coordinate> moves = new ArrayList<Coordinate>();
     private static boolean changed;
     private static boolean randomSim;
-    private static final int SIMULATIONS_MAX = (int) Math.pow(2, 20); // Exponent must be less than 64
+    private static final int MAX_DETERMINED_SIM_REGION = 16;
+    private static final int SIMULATIONS_MAX = (int) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1; // Exponent must be less than 64
 
     // A region is a collection of unswept tiles paired with a list of swept tiles whose value they influence
     // Two regions are disjoint if no two unswept tiles in the regions share any adjacent swept tiles
@@ -64,6 +65,18 @@ public class AI {
             ArrayList<Coordinate> adj = new ArrayList<Coordinate>();
             Scanner key = new Scanner(System.in);
             while (!Board.endGame()) {
+                if (!Main.isTesting()) {
+                    if (STEP_BY_STEP) {
+                        key.nextInt();
+                    }
+                    if (AUTO) {
+                        try {
+                            Thread.sleep(AUTO_TIME);
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
                 randomSim = false;
                 changed = false;
                 //update probabilities
@@ -87,9 +100,6 @@ public class AI {
                             newProbability = 1.0 - newProbability;
                             newProbability += (double) (Board.getNumMines() - numSusMines)
                                     / (double) ((Board.getWidth() * Board.getWidth()) - numSwept);
-                        /*
-                        newProbability = Math.min(newProbability, 0.99);
-                        */
                             newProbability += sigmoid(bias(i, j, Board.getHeight(), Board.getWidth())) / 100.0;
                             newProbability = sigmoid(newProbability);
                             if (adj.size() > getAdjUnSwept(i, j).size()) {
@@ -109,17 +119,17 @@ public class AI {
                                 }
                             }
                         }
-                        if (suspectedMine[i][j]) {
+                        if (suspectedMine[i][j] || Board.getBoard()[i][j] == 9) {
                             newProbability = 1.0;
                         }
-                        if (Board.getBoard()[i][j] != -1) {
+                        if (Board.getBoard()[i][j] != -1 && Board.getBoard()[i][j] != 9) {
                             newProbability = 0.0;
                         }
                         if (Math.abs(newProbability - probabilityMine[i][j]) > EPSILON) {
                             probabilityMine[i][j] = newProbability;
                             changed = true;
                             if (newProbability > 1.0 - EPSILON && !suspectedMine[i][j]) {
-                                System.out.println("MINE");
+                                //System.out.println("MINE");
                                 suspectedMine[i][j] = true;
                                 numSusMines++;
                             }
@@ -138,45 +148,12 @@ public class AI {
                         }
                     }
                 }
-                changed = sweepVoid();
-                if (!Main.isTesting()) {
-                    if (STEP_BY_STEP) {
-                        key.nextInt();
-                    }
-                    if (AUTO) {
-                        try {
-                            Thread.sleep(AUTO_TIME);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
+                //System.out.println("Cycle: " + numSwept);
+                if (sweepVoid()) {
+                    changed = true;
                 }
                 if (!changed) {
-                    if (Board.getHeight() * Board.getWidth() - numSusMines - numSwept
-                            > (int) Math.ceil(Math.log(SIMULATIONS_MAX)/Math.log(2.0))) {
-                        ArrayList<Region> regions = getRegions();
-                        for (int i = 0; i < regions.size(); i++) {
-                            if (!simulateMineProbabilityRegion(regions.get(i), false)) {
-                                randomSim = true;
-                            }
-                        }
-                    } else {
-                        simulateMineProbabilityRegion(getSuperRegion(), true);
-                    }
                     sweepLowestProb();
-                }
-            }
-
-            if (!Main.isTesting()) {
-                if (STEP_BY_STEP) {
-                    key.nextInt();
-                }
-                if (AUTO) {
-                    try {
-                        Thread.sleep(AUTO_TIME);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
                 }
             }
             if (!Board.isDead()) {
@@ -209,10 +186,26 @@ public class AI {
 
     // Returns true if certain, otherwise returns false
     public static boolean simulateMineProbabilityRegion(Region reg, boolean endGame) {
+        Scanner key = new Scanner(System.in);
+        //System.out.println("sim");
+        int validConfigs = 0;
         boolean[] regionalMine = new boolean[reg.size()];
         int[] validMineCount = new int[reg.size()];
         for (int i = 0; i < validMineCount.length; i++) {
             validMineCount[i] = 0;
+            regionalMine[i] = true;
+        }
+        if (!Main.isTesting()) {
+            if (STEP_BY_STEP) {
+                key.nextInt();
+            }
+            if (AUTO) {
+                try {
+                    Thread.sleep(AUTO_TIME);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
         }
         if (Math.pow(2, reg.size()) > SIMULATIONS_MAX) { // Random Simulate
             Random rand = new Random();
@@ -221,6 +214,7 @@ public class AI {
                     regionalMine[j] = rand.nextBoolean();
                 }
                 if (Region.valid(reg, regionalMine)) {
+                    validConfigs++;
                     for (int k = 0; k < validMineCount.length; k++) {
                         if (regionalMine[k]) {
                             validMineCount[k]++;
@@ -228,17 +222,31 @@ public class AI {
                     }
                 }
             }
+            //System.out.println(validConfigs + "*");
+
             for (int i = 0; i < reg.size(); i++) {
-                probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
-                        = (double) validMineCount[i] / (double) SIMULATIONS_MAX;
+                if (validConfigs != 0 /*&& validMineCount[i] / validConfigs == 0
+                        || validConfigs != 0 && validMineCount[i] / validConfigs == 1*/) {
+                    probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                            = (double) validMineCount[i] / (double) validConfigs;
+                    if (validMineCount[i] != 0 && validMineCount[i] != validConfigs) {
+                        probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                                += sigmoid(bias(reg.get(i).getInfluencer().getX(), reg.get(i).getInfluencer().getY(),
+                                Board.getHeight(), Board.getWidth())) / 10000.0;
+                        probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                                = sigmoid(probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]);
+                    }
+                }
             }
             return false;
         } else {
-            for (long i = 0; i < Math.pow(2, reg.size()); i++) {
-                regionMineArrangement(regionalMine, i);
+            for (long i = 0; i < (int) Math.pow(2, reg.size()); i++) {
+                regionalMine = regionMineArrangement(regionalMine, i);
                 if (Region.valid(reg, regionalMine)) {
                     if (endGame) {
+                        //System.out.println("Region.numMines(i) = " + Region.numMines(i) + " Board.getNumMines() =  " + Board.getNumMines() + " numSusMines = " + numSusMines);
                         if (Region.numMines(i) == Board.getNumMines() - numSusMines) {
+                            validConfigs++;
                             for (int k = 0; k < validMineCount.length; k++) {
                                 if (regionalMine[k]) {
                                     validMineCount[k]++;
@@ -246,6 +254,7 @@ public class AI {
                             }
                         }
                     } else {
+                        validConfigs++;
                         for (int k = 0; k < validMineCount.length; k++) {
                             if (regionalMine[k]) {
                                 validMineCount[k]++;
@@ -254,53 +263,82 @@ public class AI {
                     }
                 }
             }
+            //System.out.println(validConfigs);
             for (int i = 0; i < reg.size(); i++) {
-                probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
-                        = (double) validMineCount[i] / (double) SIMULATIONS_MAX;
+                if (validConfigs != 0 /*&& validMineCount[i] / validConfigs == 0
+                        || validConfigs != 0 && validMineCount[i] / validConfigs == 1*/) {
+                    probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                            = (double) validMineCount[i] / (double) validConfigs;
+                    if (validMineCount[i] != 0 && validMineCount[i] != validConfigs) {
+                        probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                                += sigmoid(bias(reg.get(i).getInfluencer().getX(), reg.get(i).getInfluencer().getY(),
+                                Board.getHeight(), Board.getWidth())) / 10000.0;
+                        probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
+                                = sigmoid(probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]);
+                    }
+                }
             }
             return true;
         }
     }
 
-    public static void regionMineArrangement(boolean[] regionalMine, long arrangementNum) {
+    public static boolean[] regionMineArrangement(boolean[] regionalMine, long arrangementNum) {
         String arrangement = Long.toBinaryString(arrangementNum);
         arrangement = padZero(arrangement, regionalMine.length);
         for (int i = 0; i < regionalMine.length; i++) {
-            regionalMine[i] = arrangement.charAt(i) == '1';
+            if (arrangement.charAt(i) == '1') {
+                regionalMine[i] = true;
+            } else {
+                regionalMine[i] = false;
+            }
         }
+        //System.out.println(Region.numMines(arrangementNum));
+        return regionalMine;
     }
 
     public static String padZero(String arrangement, int length) {
         while (arrangement.length() < length) {
             arrangement = "0" + arrangement;
         }
+        //System.out.println(arrangement);
         return arrangement;
     }
 
     public static ArrayList<Region> getRegions() {
         ArrayList<Region> regions = new ArrayList<Region>();
+        //System.out.println("getInfluences");
         ArrayList<Influence> influences = new ArrayList<Influence>(getInfluences());
+        boolean in;
+        //System.out.println("addInfluencesToRegions");
         for (int i = 0; i < influences.size(); i++) {
+            in = false;
             for (int j = 0; j < regions.size(); j++) {
                 if (Region.infInRegion(influences.get(i), regions.get(j))) {
-                    regions.add(new Region(influences.get(i)));
-                } else {
                     regions.get(j).add(influences.get(i));
+                    in = true;
+                    break;
                 }
+            }
+            if (!in) {
+                regions.add(new Region(influences.get(i)));
             }
         }
         // merge non-disjoint regions
-        changed = true;
+        boolean merged = true;
         boolean breakFlag = false;
-        while (changed) {
-            changed = false;
+        //System.out.println("mergeRegions");
+        int counter = 0;
+        while (merged) {
+            merged = false;
             breakFlag = false;
             for (int i = 0; i < regions.size() - 1; i++) {
                 for (int j = i + 1; j < regions.size(); j++) {
+                    //System.out.println(counter);
+                    counter++;
                     if (!Region.disjoint(regions.get(i), regions.get(j))) {
                         regions.get(i).addAll(regions.get(j));
                         regions.remove(j);
-                        changed = true;
+                        merged = true;
                         breakFlag = true;
                         break;
                     }
@@ -314,6 +352,7 @@ public class AI {
     }
 
     public static Region getSuperRegion() {
+        //System.out.println("getInfluences");
         return new Region(getInfluences());
     }
 
@@ -321,7 +360,9 @@ public class AI {
         ArrayList<Influence> influences = new ArrayList<Influence>();
         for (int i = 0; i < Board.getHeight(); i++) {
             for (int j = 0; j < Board.getWidth(); j++) {
-                if (Board.getBoard()[i][j] == -1 && getAdjSwept(i, j).size() != 0) {
+                if (Board.getBoard()[i][j] == -1
+                        && getAdjSwept(i, j).size() != 0
+                        && !suspectedMine[i][j]) {
                     influences.add(new Influence(new Coordinate(i, j), getAdjSwept(i, j)));
                 }
             }
@@ -330,6 +371,7 @@ public class AI {
     }
 
     public static void sweepLowestProb() {
+        //System.out.println("sweep lowest");
         Coordinate lowest = new Coordinate(0, 0);
         lowestProb = 1.0;
         for (int i = 0; i < Board.getHeight(); i++) {
@@ -342,12 +384,77 @@ public class AI {
                 }
             }
         }
-        moves.add(new Coordinate(lowest.getX(), lowest.getY()));
-        Board.sweep(lowest.getX(), lowest.getY());
+        if (lowestProb > 0.0 + EPSILON) {
+            //System.out.println("getRegion");
+            Scanner key = new Scanner(System.in);
+            if (!Main.isTesting()) {
+                if (STEP_BY_STEP) {
+                    key.nextInt();
+                }
+                if (AUTO) {
+                    try {
+                        Thread.sleep(AUTO_TIME);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+            if (Board.getHeight() * Board.getWidth() - numSusMines - numSwept
+                    > (int) Math.ceil(Math.log(SIMULATIONS_MAX) / Math.log(2.0))) {
+                ArrayList<Region> regions = getRegions();
+                for (int i = 0; i < regions.size(); i++) {
+                    if (!simulateMineProbabilityRegion(regions.get(i), false)) {
+                        randomSim = true;
+                    }
+                }
+            } else {
+                simulateMineProbabilityRegion(getSuperRegion(), true);
+            }
+            boolean toReturn = false;
+            for (int i = 0; i < Board.getHeight(); i++) {
+                for (int j = 0; j < Board.getWidth(); j++) {
+                    if (probabilityMine[i][j] > 1.0 - EPSILON && !suspectedMine[i][j]) {
+                        //System.out.println("MINE");
+                        suspectedMine[i][j] = true;
+                        numSusMines++;
+                        if (randomSim) {
+                            numGuessed++;
+                        }
+                        toReturn = true;
+                        if (randomSim) {
+                            return;
+                        }
+                    }
+                }
+            }
+            if (!randomSim) {
+                if (sweepVoid()) {
+                    return;
+                }
+            }
+            if (toReturn) {
+                return;
+            }
+            lowestProb = 1.0;
+            for (int i = 0; i < Board.getHeight(); i++) {
+                for (int j = 0; j < Board.getWidth(); j++) {
+                    if (probabilityMine[i][j] < lowestProb && Board.getBoard()[i][j] == -1 && !suspectedMine[i][j]
+                            || Board.getBoard()[lowest.getX()][lowest.getY()] != -1 && Board.getBoard()[i][j] == -1 && !suspectedMine[i][j]) {
+                        lowest.setX(i);
+                        lowest.setY(j);
+                        lowestProb = probabilityMine[i][j];
+                        //System.out.println("I should always print this before dying");
+                    }
+                }
+            }
+        }
         if (lowestProb > 0.0 + EPSILON || randomSim) {
             numGuessed++;
         }
+        Board.sweep(lowest.getX(), lowest.getY());
+        moves.add(new Coordinate(lowest.getX(), lowest.getY()));
         numSwept++;
+        //System.out.println("done");
     }
 
     // returns true if swept something

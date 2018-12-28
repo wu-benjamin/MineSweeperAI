@@ -87,11 +87,22 @@ public class Region {
         return Long.bitCount(arrangement);
     }
 
+    public static boolean inRegion(Region reg, int x, int y) {
+        for (int i = 0; i < reg.size(); i++) {
+            for(int j = 0; j < reg.get(i).getAdj().size(); j++) {
+                if (x == reg.get(i).getAdj().get(j).getX() && y == reg.get(i).getAdj().get(j).getY()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public static boolean valid(Region reg, boolean[] mines) {
         int[][] simValue = new int[Board.getHeight()][Board.getWidth()];
         for (int i = 0; i < simValue.length; i++) {
             for (int j = 0; j < simValue[0].length; j++) {
-                simValue[i][j] = -1;
+                simValue[i][j] = AI.getAdjSusMines(i, j).size();
             }
         }
         for (int i = 0; i < reg.size(); i++) {
@@ -104,8 +115,19 @@ public class Region {
         // Check if simValue agrees with actual values
         for (int i = 0; i < Board.getHeight(); i++) {
             for (int j = 0; j < Board.getWidth(); j++) {
-                if (simValue[i][j] != -1) {
+                if (inRegion(reg, i, j)) {
                     if (simValue[i][j] != Board.getBoard()[i][j]) {
+                        /*
+                        for (int k = 0; k < mines.length; k++) {
+                            if (!mines[k]) {
+                                System.out.print(0);
+                            } else {
+                                System.out.print(1);
+                            }
+                        }
+                        System.out.println();
+                        System.out.println("i: " + i + " j: " + j + " simVal: " + simValue[i][j] + " BoardVal: " + Board.getBoard()[i][j]);
+                        */
                         return false;
                     }
                 }

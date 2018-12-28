@@ -21,6 +21,7 @@ public class Board {
         Board.width = width;
         Board.height = height;
         Board.numMines = numMines;
+
         if (width * height <= numMines) {
             throw new Exception("Too many mines!");
         }
@@ -30,27 +31,44 @@ public class Board {
                 mines[i][j] = false;
             }
         }
+        // Test deduction end game
+        /*
+        mines[0][0] = true;
+        mines[0][2] = true;
+        mines[0][4] = true;
+        mines[0][5] = true;
+        mines[0][7] = true;
+        */
+
+        // wut
+        /*
+        mines[0][1] = true;
+        mines[1][7] = true;
+        mines[3][1] = true;
+        mines[3][7] = true;
+        mines[4][2] = true;
+        mines[4][3] = true;
+        mines[4][7] = true;
+        mines[5][2] = true;
+        mines[6][1] = true;
+        mines[6][8] = true;
+        */
+
+        // wut #2
+        /*
+        mines[2][2] = true;
+        mines[2][4] = true;
+        mines[4][2] = true;
+        */
         Board.mines = mines;
 
-        /*
         int nextMine;
         for (int i = 0; i < numMines; i++) {
             nextMine = rand.nextInt(width * height - i);
             setMine(nextMine);
         }
-        */
-
-        //TEST***************************************************
-        mines[0][0] = true;
-        mines[0][2] = true;
-        mines[0][3] = true;
-        mines[0][5] = true;
-        mines[0][7] = true;
-
-        // TEST***************************************************
 
 
-        Board.mines = mines;
         int[][] gameBoard = new int[height][width];
         for (int i = 0; i < height; i++) {
             for (int j = 0; j < width; j++) {
