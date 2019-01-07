@@ -16,11 +16,11 @@ public class Main extends JPanel implements Runnable {
     private static final int WIDTH = 16;
     private static final int HEIGHT = 16;
     private static final int NUM_MINES = 40;
-    private static final int WINDOW_SIZE = 600;
+    private static final int WINDOW_SIZE = 750;
     private static JFrame frame = new JFrame("MineSweeper");
     private static Main panel = new Main();
-    private static final boolean TEST = true;
-    private static final int ITERATIONS = 1000;
+    private static final boolean TEST = false;
+    private static final int ITERATIONS = 100;
     private static ArrayList<TestConditions> tests = new ArrayList<TestConditions>();
 
     public static boolean isTesting() {
@@ -29,8 +29,8 @@ public class Main extends JPanel implements Runnable {
 
     public static void addTests() {
         tests.add(new TestConditions(9, 9, 10));
-        tests.add(new TestConditions(8, 8, 10));
-        tests.add(new TestConditions(16, 16, 40));
+        //tests.add(new TestConditions(8, 8, 10));
+        //tests.add(new TestConditions(16, 16, 40));
         //tests.add(new TestConditions(24, 24, 99));
         //tests.add(new TestConditions(30, 16, 99));
     }

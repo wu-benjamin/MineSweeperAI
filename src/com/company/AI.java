@@ -11,8 +11,8 @@ public class AI {
     private static double[][] probabilityMine;
     private static final boolean STEP_BY_STEP = false;
     private static final boolean AUTO = true;
-    private static final boolean DISCARD_DEATH_TURN_ONE = true;
-    private static final int AUTO_TIME = 100;
+    private static final boolean DISCARD_DEATH_TURN_ONE = true; // Discounts turn one deaths from win rate in AIOutput
+    private static final int AUTO_TIME = 250;
     private static final int PREFERRED_COORDINATE = 3;
     private static double newProbability;
     private static double lowestProb;
@@ -23,19 +23,8 @@ public class AI {
     private static ArrayList<Coordinate> moves = new ArrayList<Coordinate>();
     private static boolean changed;
     private static boolean randomSim;
-    private static final int MAX_DETERMINED_SIM_REGION = 16;
+    private static final int MAX_DETERMINED_SIM_REGION = 20;
     private static final int SIMULATIONS_MAX = (int) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1; // Exponent must be less than 64
-
-    // A region is a collection of unswept tiles paired with a list of swept tiles whose value they influence
-    // Two regions are disjoint if no two unswept tiles in the regions share any adjacent swept tiles
-    // Analyze a region of size N by trying 2 ^ N combinations of mine or no mine on each tile in the region
-    // and checking if the configuration is valid given the numbers on swept tiles
-    // The probability of a tile being a mine is the number of valid configurations with the tile being a mine
-    // divided by the number of valid configurations
-    // For low remaining tiles, consider all remaining tiles as a "super-region"
-    // If only one contiguous region exists and the region contains all remaining unswept tiles,
-    // when checking for valid mine configurations, remove all configurations with a number of mines different from
-    // the actual number of remaining mines
 
     // 0 = fail
     // 1 = win
@@ -225,7 +214,9 @@ public class AI {
             //System.out.println(validConfigs + "*");
 
             for (int i = 0; i < reg.size(); i++) {
-                if (validConfigs != 0 /*&& validMineCount[i] / validConfigs == 0
+                if (validConfigs * (double) validMineCount[i] / (double) validConfigs >= 10
+                        && validConfigs * (1.0 - (double) validMineCount[i] / (double) validConfigs) >= 10
+                    /*validConfigs != 0*/ /*&& validMineCount[i] / validConfigs == 0
                         || validConfigs != 0 && validMineCount[i] / validConfigs == 1*/) {
                     probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
                             = (double) validMineCount[i] / (double) validConfigs;
@@ -409,6 +400,18 @@ public class AI {
                 }
             } else {
                 simulateMineProbabilityRegion(getSuperRegion(), true);
+            }
+            if (!Main.isTesting()) {
+                if (STEP_BY_STEP) {
+                    key.nextInt();
+                }
+                if (AUTO) {
+                    try {
+                        Thread.sleep(AUTO_TIME);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
             }
             boolean toReturn = false;
             for (int i = 0; i < Board.getHeight(); i++) {

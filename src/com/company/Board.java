@@ -214,13 +214,23 @@ public class Board {
                     } else if (AI.getSuspectedMine()[i][j]) {
                         g.setColor(Color.GREEN);
                     } else {
-                        g.setColor(Color.DARK_GRAY);
+                        //g.setColor(Color.DARK_GRAY);
+                        g.setColor(new Color(255,
+                                (int) (255 - 165 * AI.getMineProbabilities()[i][j]),
+                                (int) (255 - 85 * AI.getMineProbabilities()[i][j])));
                     }
                     g.fill3DRect(20 + j * Main.getUnitCellSize(), 20 + i * Main.getUnitCellSize(),
                             Main.getUnitCellSize(), Main.getUnitCellSize(), false);
+                    if (gameBoard[i][j] != 9 && !AI.getSuspectedMine()[i][j]) {
+                        g.setColor(new Color(0, 0, 0));
+                        g.fill3DRect(20 + j * Main.getUnitCellSize(), 20 + i * Main.getUnitCellSize(),
+                                Main.getUnitCellSize() / 2, Main.getUnitCellSize() / 2, false);
+                    } else {
+                        g.setColor(Color.WHITE);
+                        g.drawString("B", 20 + j * Main.getUnitCellSize() + Main.getUnitCellSize() / 2,
+                                20 + (i + 1) * Main.getUnitCellSize() - Main.getUnitCellSize() / 2);
+                    }
                     g.setColor(Color.WHITE);
-                    g.drawString("B", 20 + j * Main.getUnitCellSize() + Main.getUnitCellSize() / 2,
-                            20 + (i + 1) * Main.getUnitCellSize() - Main.getUnitCellSize() / 2);
                 } else {
                     if (gameBoard[i][j] > -1) {
                         g.setColor(Color.WHITE);
@@ -233,6 +243,13 @@ public class Board {
                         g.drawString(Integer.toString(gameBoard[i][j]), 20 + j * Main.getUnitCellSize() + Main.getUnitCellSize() / 2,
                                 20 + (i + 1) * Main.getUnitCellSize() - Main.getUnitCellSize() / 2);
                     }
+                     else if (gameBoard[i][j] == -1) {
+                        g.setColor(new Color(255,
+                                (int) (255 - 165 * AI.getMineProbabilities()[i][j]),
+                                (int) (255 - 85 * AI.getMineProbabilities()[i][j])));
+                        g.fill3DRect(20 + j * Main.getUnitCellSize(), 20 + i * Main.getUnitCellSize(),
+                                Main.getUnitCellSize(), Main.getUnitCellSize(), false);
+                    }
                 }
                 prob = df.format(AI.getMineProbabilities()[i][j]);
                 if (mines[i][j]) {
@@ -240,7 +257,7 @@ public class Board {
                 } else {
                     g.setColor(Color.BLACK);
                 }
-                g.drawString(prob, 20 + j * Main.getUnitCellSize(), 10 + (i + 1) * Main.getUnitCellSize());
+                //g.drawString(prob, 20 + j * Main.getUnitCellSize(), 10 + (i + 1) * Main.getUnitCellSize());
             }
         }
         for (int i = 0; i < height; i++) {
@@ -251,7 +268,7 @@ public class Board {
         for (int i = 0; i < width; i++) {
             g.setColor(Color.BLACK);
             g.drawString(Integer.toString(i),
-                    20 + (i + 1) * Main.getUnitCellSize() - Main.getUnitCellSize() / 2,
+                    15 + (i + 1) * Main.getUnitCellSize() - Main.getUnitCellSize() / 2,
                     15);
         }
         for (int i = 0; i < height; i++) {
