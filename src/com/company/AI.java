@@ -23,8 +23,9 @@ public class AI {
     private static ArrayList<Coordinate> moves = new ArrayList<Coordinate>();
     private static boolean changed;
     private static boolean randomSim;
-    private static final int MAX_DETERMINED_SIM_REGION = 20;
-    private static final int SIMULATIONS_MAX = (int) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1; // Exponent must be less than 64
+    private static final int MIN_NP_NQ = 9;
+    private static final int MAX_DETERMINED_SIM_REGION = 16; // Must be less than 63
+    private static final long SIMULATIONS_MAX = (long) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1;
 
     // 0 = fail
     // 1 = win
@@ -214,8 +215,8 @@ public class AI {
             //System.out.println(validConfigs + "*");
 
             for (int i = 0; i < reg.size(); i++) {
-                if (validConfigs * (double) validMineCount[i] / (double) validConfigs >= 10
-                        && validConfigs * (1.0 - (double) validMineCount[i] / (double) validConfigs) >= 10
+                if (validConfigs * (double) validMineCount[i] / (double) validConfigs >= MIN_NP_NQ
+                        && validConfigs * (1.0 - (double) validMineCount[i] / (double) validConfigs) >= MIN_NP_NQ
                     /*validConfigs != 0*/ /*&& validMineCount[i] / validConfigs == 0
                         || validConfigs != 0 && validMineCount[i] / validConfigs == 1*/) {
                     probabilityMine[reg.get(i).getInfluencer().getX()][reg.get(i).getInfluencer().getY()]
@@ -391,7 +392,7 @@ public class AI {
                 }
             }
             if (Board.getHeight() * Board.getWidth() - numSusMines - numSwept
-                    > (int) Math.ceil(Math.log(SIMULATIONS_MAX) / Math.log(2.0))) {
+                    > (long) Math.ceil(Math.log(SIMULATIONS_MAX) / Math.log(2.0))) {
                 ArrayList<Region> regions = getRegions();
                 for (int i = 0; i < regions.size(); i++) {
                     if (!simulateMineProbabilityRegion(regions.get(i), false)) {
