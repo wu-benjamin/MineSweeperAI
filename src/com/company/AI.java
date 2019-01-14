@@ -23,7 +23,7 @@ public class AI {
     private static ArrayList<Coordinate> moves = new ArrayList<Coordinate>();
     private static boolean changed;
     private static boolean randomSim;
-    private static final int MIN_NP_NQ = 9;
+    private static final int MIN_NP_NQ = 10;
     private static final int MAX_DETERMINED_SIM_REGION = 16; // Must be less than 63
     private static final long SIMULATIONS_MAX = (long) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1;
 
