@@ -9,21 +9,20 @@ public class AIOutput {
     int gameResult;
     ArrayList<Coordinate> moves;
 
-    public AIOutput() {
+    AIOutput() {
         this.numGuessed = -1;
         this.numMarked = -1;
         this.maxMove = -1;
         this.gameResult = -1;
-        this.moves = new ArrayList<Coordinate>();
-        return;
+        this.moves = new ArrayList<>();
     }
 
-    public AIOutput(int numGuessed, int numMarked, int moveNum, int gameResult, ArrayList<Coordinate> moves) {
+    AIOutput(int numGuessed, int numMarked, int moveNum, int gameResult, ArrayList<Coordinate> moves) {
         this.numGuessed = numGuessed;
         this.numMarked = numMarked;
         this.maxMove = moveNum;
         this.gameResult = gameResult;
-        this.moves = new ArrayList<Coordinate>(moves);
+        this.moves = new ArrayList<>(moves);
     }
 
     public void setNumMarked(int numMarked) {
@@ -43,6 +42,6 @@ public class AIOutput {
     }
 
     public void setMoves(ArrayList<Coordinate> moves) {
-        this.moves = new ArrayList<Coordinate>(moves);
+        this.moves = new ArrayList<>(moves);
     }
 }

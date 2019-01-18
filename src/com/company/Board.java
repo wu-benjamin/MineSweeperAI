@@ -15,7 +15,7 @@ public class Board {
     private static boolean dead;
     private static Random rand = new Random();
 
-    public Board(int width, int height, int numMines) throws Exception {
+    Board(int width, int height, int numMines) throws Exception {
         win = false;
         dead = false;
         Board.width = width;
@@ -103,26 +103,25 @@ public class Board {
                 gameBoard[i][j] = -1;
             }
         }
-        return;
     }
 
-    public static boolean isDead() {
+    static boolean isDead() {
         return dead;
     }
 
-    public static boolean endGame() {
+    static boolean endGame() {
         return dead || win;
     }
 
-    public static int getWidth() {
+    static int getWidth() {
         return width;
     }
 
-    public static int getHeight() {
+    static int getHeight() {
         return height;
     }
 
-    public static int getNumMines() {
+    static int getNumMines() {
         return numMines;
     }
 
@@ -163,7 +162,7 @@ public class Board {
         gameBoard[x][y] = value;
     }
 
-    public static void sweep(int x, int y) {
+    static void sweep(int x, int y) {
         if (gameBoard[x][y] == -1) {
             numSafe--;
         }
@@ -179,13 +178,13 @@ public class Board {
         }
     }
 
-    public static int[][] getBoard() {
+    static int[][] getBoard() {
         return gameBoard;
     }
 
-    public void paintComponent(Graphics2D g) {
-        String prob;
-        DecimalFormat df = new DecimalFormat("#.##");
+    void paintComponent(Graphics2D g) {
+        //String prob;
+        //DecimalFormat df = new DecimalFormat("#.##");
         if (dead) {
             g.setColor(Color.BLACK);
             g.drawString("D", 0, 20);
@@ -251,7 +250,7 @@ public class Board {
                                 Main.getUnitCellSize(), Main.getUnitCellSize(), false);
                     }
                 }
-                prob = df.format(AI.getMineProbabilities()[i][j]);
+                //prob = df.format(AI.getMineProbabilities()[i][j]);
                 if (mines[i][j]) {
                     g.setColor(Color.WHITE);
                 } else {

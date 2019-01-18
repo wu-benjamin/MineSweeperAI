@@ -21,13 +21,13 @@ public class Main extends JPanel implements Runnable {
     private static Main panel = new Main();
     private static final boolean TEST = false;
     private static final int ITERATIONS = 100;
-    private static ArrayList<TestConditions> tests = new ArrayList<TestConditions>();
+    private static ArrayList<TestConditions> tests = new ArrayList<>();
 
-    public static boolean isTesting() {
+    static boolean isTesting() {
         return TEST;
     }
 
-    public static void addTests() {
+    private static void addTests() {
         tests.add(new TestConditions(9, 9, 10));
         //tests.add(new TestConditions(8, 8, 10));
         //tests.add(new TestConditions(16, 16, 40));
@@ -78,7 +78,7 @@ public class Main extends JPanel implements Runnable {
             try {
                 AI.mineSweeper();
             } catch (Exception e) {
-                System.out.println("AI no do :(");
+                e.printStackTrace();
             }
         } else {
             int validTry;
@@ -99,15 +99,15 @@ public class Main extends JPanel implements Runnable {
                 numMarkedMine = 0;
                 for (int i = 0; i < ITERATIONS; i++) {
                     try {
-                        board = new Board(tests.get(testNum).width, tests.get(testNum).height,
-                                tests.get(testNum).numMines);
+                        board = new Board(tests.get(testNum).getWidth(), tests.get(testNum).getHeight(),
+                                tests.get(testNum).getNumMines());
                     } catch (Exception e) {
                         System.out.println("Error creating board!");
                     }
                     try {
                         out = AI.mineSweeper();
                     } catch (Exception e) {
-                        System.out.println("AI no do :(");
+                        e.printStackTrace();
                     }
                     switch (out.gameResult) {
                         // dead after move 1
@@ -132,8 +132,8 @@ public class Main extends JPanel implements Runnable {
                     System.out.println("Test: " + (testNum + 1) + " out of " + tests.size() +
                             "\nIteration: " + (i + 1) + " out of " + ITERATIONS);
                 }
-                summary.add("Test Conditions: W * H, NUM_MINES: " + tests.get(testNum).width + " * "
-                + tests.get(testNum).height + ", " + tests.get(testNum).numMines);
+                summary.add("Test Conditions: W * H, NUM_MINES: " + tests.get(testNum).getWidth() + " * "
+                + tests.get(testNum).getHeight() + ", " + tests.get(testNum).getNumMines());
                 summary.add("Iterations: " + ITERATIONS);
                 summary.add("Number of invalid tries: " + invalidTry);
                 summary.add("Number of valid tries: " + validTry);

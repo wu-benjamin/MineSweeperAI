@@ -16,39 +16,36 @@ import java.util.ArrayList;
 public class Region {
     private ArrayList<Influence> members;
     public Region() {
-        this.members = new ArrayList<Influence>();
-        return;
+        this.members = new ArrayList<>();
     }
 
-    public Region(ArrayList<Influence> influences) {
-        this.members = new ArrayList<Influence>(influences);
-        return;
+    Region(ArrayList<Influence> influences) {
+        this.members = new ArrayList<>(influences);
     }
 
-    public Region(Influence inf) {
-        ArrayList<Influence> members = new ArrayList<Influence>();
+    Region(Influence inf) {
+        ArrayList<Influence> members = new ArrayList<>();
         members.add(inf);
         this.members = members;
-        return;
     }
 
-    public void add(Influence inf) {
+    void add(Influence inf) {
         this.members.add(inf);
     }
 
-    public int size() {
+    int size() {
         return this.members.size();
     }
 
-    public Influence get(int index) {
+    Influence get(int index) {
         return this.members.get(index);
     }
 
-    public void addAll(Region reg) {
+    void addAll(Region reg) {
         this.members.addAll(reg.members);
     }
 
-    public static boolean disjoint(Region a, Region b) {
+    static boolean disjoint(Region a, Region b) {
         boolean[][] influenced = new boolean[Board.getHeight()][Board.getWidth()];
         for (int i = 0; i < Board.getHeight(); i++) {
             for (int j = 0; j < Board.getWidth(); j++) {
@@ -70,7 +67,7 @@ public class Region {
         return true;
     }
 
-    public static boolean infInRegion(Influence inf, Region reg) {
+    static boolean infInRegion(Influence inf, Region reg) {
         for (int i = 0; i < reg.size(); i++) {
             for (int j = 0; j < inf.getAdj().size(); j++) {
                 for (int k = 0; k < reg.get(i).getAdj().size(); k++) {
@@ -83,11 +80,11 @@ public class Region {
         return false;
     }
 
-    public static int numMines(long arrangement) {
+    static int numMines(long arrangement) {
         return Long.bitCount(arrangement);
     }
 
-    public static boolean inRegion(Region reg, int x, int y) {
+    private static boolean inRegion(Region reg, int x, int y) {
         for (int i = 0; i < reg.size(); i++) {
             for(int j = 0; j < reg.get(i).getAdj().size(); j++) {
                 if (x == reg.get(i).getAdj().get(j).getX() && y == reg.get(i).getAdj().get(j).getY()) {
@@ -98,7 +95,7 @@ public class Region {
         return false;
     }
 
-    public static boolean valid(Region reg, boolean[] mines) {
+    static boolean valid(Region reg, boolean[] mines) {
         int[][] simValue = new int[Board.getHeight()][Board.getWidth()];
         for (int i = 0; i < simValue.length; i++) {
             for (int j = 0; j < simValue[0].length; j++) {

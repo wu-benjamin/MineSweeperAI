@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Random;
 import java.util.Scanner;
 
-public class AI {
+class AI {
 
     private static final double EPSILON = 0.00000000001;
     private static boolean[][] suspectedMine;
@@ -30,7 +30,7 @@ public class AI {
     // 0 = fail
     // 1 = win
     // -1 = dead turn one (also considered an invalid run)
-    public static AIOutput mineSweeper() {
+    static AIOutput mineSweeper() {
         probabilityMine = new double[Board.getHeight()][Board.getWidth()];
         suspectedMine = new boolean[Board.getHeight()][Board.getWidth()];
         try {
@@ -52,7 +52,7 @@ public class AI {
             numSwept = 0;
             numSusMines = 0;
             numGuessed = 0;
-            ArrayList<Coordinate> adj = new ArrayList<Coordinate>();
+            ArrayList<Coordinate> adj;
             Scanner key = new Scanner(System.in);
             while (!Board.endGame()) {
                 if (!Main.isTesting()) {
@@ -74,7 +74,7 @@ public class AI {
                     for (int j = 0; j < Board.getWidth(); j++) {
                         newProbability = (double) (Board.getNumMines() - numSusMines)
                                 / (double) ((Board.getWidth() * Board.getWidth()) - numSwept);
-                        adj = new ArrayList<Coordinate>(getAdj(i, j));
+                        adj = new ArrayList<>(getAdj(i, j));
                         newProbability += sigmoid(bias(i, j, Board.getHeight(), Board.getWidth())) / 10000.0;
                         newProbability = sigmoid(newProbability);
                         if (adj.size() > getAdjUnSwept(i, j).size()) {
@@ -175,7 +175,7 @@ public class AI {
     }
 
     // Returns true if certain, otherwise returns false
-    public static boolean simulateMineProbabilityRegion(Region reg, boolean endGame) {
+    private static boolean simulateMineProbabilityRegion(Region reg, boolean endGame) {
         Scanner key = new Scanner(System.in);
         //System.out.println("sim");
         int validConfigs = 0;
@@ -274,7 +274,7 @@ public class AI {
         }
     }
 
-    public static boolean[] regionMineArrangement(boolean[] regionalMine, long arrangementNum) {
+    private static boolean[] regionMineArrangement(boolean[] regionalMine, long arrangementNum) {
         String arrangement = Long.toBinaryString(arrangementNum);
         arrangement = padZero(arrangement, regionalMine.length);
         for (int i = 0; i < regionalMine.length; i++) {
@@ -288,7 +288,7 @@ public class AI {
         return regionalMine;
     }
 
-    public static String padZero(String arrangement, int length) {
+    private static String padZero(String arrangement, int length) {
         while (arrangement.length() < length) {
             arrangement = "0" + arrangement;
         }
@@ -296,12 +296,11 @@ public class AI {
         return arrangement;
     }
 
-    public static ArrayList<Region> getRegions() {
-        ArrayList<Region> regions = new ArrayList<Region>();
+    private static ArrayList<Region> getRegions() {
+        ArrayList<Region> regions = new ArrayList<>();
         //System.out.println("getInfluences");
-        ArrayList<Influence> influences = new ArrayList<Influence>(getInfluences());
+        ArrayList<Influence> influences = new ArrayList<>(getInfluences());
         boolean in;
-        //System.out.println("addInfluencesToRegions");
         for (int i = 0; i < influences.size(); i++) {
             in = false;
             for (int j = 0; j < regions.size(); j++) {
@@ -317,16 +316,12 @@ public class AI {
         }
         // merge non-disjoint regions
         boolean merged = true;
-        boolean breakFlag = false;
-        //System.out.println("mergeRegions");
-        int counter = 0;
+        boolean breakFlag;
         while (merged) {
             merged = false;
             breakFlag = false;
             for (int i = 0; i < regions.size() - 1; i++) {
                 for (int j = i + 1; j < regions.size(); j++) {
-                    //System.out.println(counter);
-                    counter++;
                     if (!Region.disjoint(regions.get(i), regions.get(j))) {
                         regions.get(i).addAll(regions.get(j));
                         regions.remove(j);
@@ -343,13 +338,13 @@ public class AI {
         return regions;
     }
 
-    public static Region getSuperRegion() {
+    private static Region getSuperRegion() {
         //System.out.println("getInfluences");
         return new Region(getInfluences());
     }
 
-    public static ArrayList<Influence> getInfluences() {
-        ArrayList<Influence> influences = new ArrayList<Influence>();
+    private static ArrayList<Influence> getInfluences() {
+        ArrayList<Influence> influences = new ArrayList<>();
         for (int i = 0; i < Board.getHeight(); i++) {
             for (int j = 0; j < Board.getWidth(); j++) {
                 if (Board.getBoard()[i][j] == -1
@@ -362,7 +357,7 @@ public class AI {
         return influences;
     }
 
-    public static void sweepLowestProb() {
+    private static void sweepLowestProb() {
         //System.out.println("sweep lowest");
         Coordinate lowest = new Coordinate(0, 0);
         lowestProb = 1.0;
@@ -478,9 +473,9 @@ public class AI {
         return swept;
     }
 
-    public static ArrayList<Coordinate> getAdjUnSwept(int x, int y) {
-        ArrayList<Coordinate> adj = new ArrayList<Coordinate>(getAdj(x, y));
-        ArrayList<Coordinate> toRemove = new ArrayList<Coordinate>();
+    private static ArrayList<Coordinate> getAdjUnSwept(int x, int y) {
+        ArrayList<Coordinate> adj = new ArrayList<>(getAdj(x, y));
+        ArrayList<Coordinate> toRemove = new ArrayList<>();
         for (int i = 0; i < adj.size(); i++) {
             if (Board.getBoard()[adj.get(i).getX()][adj.get(i).getY()] != -1) {
                 toRemove.add(adj.get(i));
@@ -490,9 +485,9 @@ public class AI {
         return adj;
     }
 
-    public static ArrayList<Coordinate> getAdjSwept(int x, int y) {
-        ArrayList<Coordinate> adj = new ArrayList<Coordinate>(getAdj(x, y));
-        ArrayList<Coordinate> toRemove = new ArrayList<Coordinate>();
+    private static ArrayList<Coordinate> getAdjSwept(int x, int y) {
+        ArrayList<Coordinate> adj = new ArrayList<>(getAdj(x, y));
+        ArrayList<Coordinate> toRemove = new ArrayList<>();
         for (int i = 0; i < adj.size(); i++) {
             if (Board.getBoard()[adj.get(i).getX()][adj.get(i).getY()] == -1) {
                 toRemove.add(adj.get(i));
@@ -502,9 +497,9 @@ public class AI {
         return adj;
     }
 
-    public static ArrayList<Coordinate> getAdjSusMines(int x, int y) {
-        ArrayList<Coordinate> adj = new ArrayList<Coordinate>(getAdj(x, y));
-        ArrayList<Coordinate> toRemove = new ArrayList<Coordinate>();
+    static ArrayList<Coordinate> getAdjSusMines(int x, int y) {
+        ArrayList<Coordinate> adj = new ArrayList<>(getAdj(x, y));
+        ArrayList<Coordinate> toRemove = new ArrayList<>();
         for (int i = 0; i < adj.size(); i++) {
             if (!suspectedMine[adj.get(i).getX()][adj.get(i).getY()]) {
                 toRemove.add(adj.get(i));
@@ -514,8 +509,8 @@ public class AI {
         return adj;
     }
 
-    public static ArrayList<Coordinate> getAdj(int x, int y) {
-        ArrayList<Coordinate> adj = new ArrayList<Coordinate>();
+    private static ArrayList<Coordinate> getAdj(int x, int y) {
+        ArrayList<Coordinate> adj = new ArrayList<>();
         if (x != 0) {
             adj.add(new Coordinate(x - 1, y));
             if (y != 0) {
@@ -545,16 +540,16 @@ public class AI {
     }
 
 
-    public static double[][] getMineProbabilities() {
+    static double[][] getMineProbabilities() {
         return probabilityMine;
     }
 
-    public static boolean[][] getSuspectedMine() {
+    static boolean[][] getSuspectedMine() {
         return suspectedMine;
     }
 
     // Function has min at |x| = |y| = 1;
-    public static double bias(int i, int j, int maxI, int maxJ) {
+    private static double bias(int i, int j, int maxI, int maxJ) {
         double x = (double) i;
         double y = (double) j;
         //board is recentered by subtracting half the x and y dimension from each x and y value respectively
@@ -571,8 +566,7 @@ public class AI {
         return (((Math.pow(x, 4) - 2 * x * x + Math.pow(y, 4) - 2 * y * y) / 4.0) + 0.5);
     }
 
-    public static double sigmoid(double x) {
+    private static double sigmoid(double x) {
         return (0.99 / (1 + Math.exp(-5* (x - 0.5))));
     }
-
 }
