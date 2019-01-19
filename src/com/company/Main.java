@@ -2,10 +2,7 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 import java.util.ArrayList;
-import java.util.Scanner;
 
 public class Main extends JPanel implements Runnable {
 
@@ -20,7 +17,7 @@ public class Main extends JPanel implements Runnable {
     private static JFrame frame = new JFrame("MineSweeper");
     private static Main panel = new Main();
     private static final boolean TEST = false;
-    private static final int ITERATIONS = 100;
+    private static final int ITERATIONS = 1000;
     private static ArrayList<TestConditions> tests = new ArrayList<>();
 
     static boolean isTesting() {
@@ -28,7 +25,7 @@ public class Main extends JPanel implements Runnable {
     }
 
     private static void addTests() {
-        tests.add(new TestConditions(9, 9, 10));
+        tests.add(new TestConditions(16, 16, 40));
         //tests.add(new TestConditions(8, 8, 10));
         //tests.add(new TestConditions(16, 16, 40));
         //tests.add(new TestConditions(24, 24, 99));
@@ -52,7 +49,7 @@ public class Main extends JPanel implements Runnable {
         board.paintComponent(g2);
     }
 
-    public static int getUnitCellSize() {
+    static int getUnitCellSize() {
         return WINDOW_SIZE / WIDTH;
     }
 
@@ -70,15 +67,18 @@ public class Main extends JPanel implements Runnable {
             frame.pack();
             Thread thread = new Thread(panel);
             thread.start();
-            try {
-                board = new Board(WIDTH, HEIGHT, NUM_MINES);
-            } catch (Exception e) {
-                System.out.println("Error creating board!");
-            }
-            try {
-                AI.mineSweeper();
-            } catch (Exception e) {
-                e.printStackTrace();
+            while (true) {
+                try {
+                    board = new Board(WIDTH, HEIGHT, NUM_MINES);
+                } catch (Exception e) {
+                    System.out.println("Error creating board!");
+                }
+                try {
+                    AI.mineSweeper();
+                    Thread.sleep(5000);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         } else {
             int validTry;

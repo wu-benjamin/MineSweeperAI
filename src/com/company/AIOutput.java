@@ -24,24 +24,4 @@ public class AIOutput {
         this.gameResult = gameResult;
         this.moves = new ArrayList<>(moves);
     }
-
-    public void setNumMarked(int numMarked) {
-        this.numMarked = numMarked;
-    }
-
-    public void setNumGuessed(int numGuessed) {
-        this.numGuessed = numGuessed;
-    }
-
-    public void setMaxMove(int moveNum) {
-        this.maxMove = moveNum;
-    }
-
-    public void setGameResult(int gameResult) {
-        this.gameResult = gameResult;
-    }
-
-    public void setMoves(ArrayList<Coordinate> moves) {
-        this.moves = new ArrayList<>(moves);
-    }
 }
