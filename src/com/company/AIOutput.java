@@ -1,5 +1,8 @@
 package com.company;
 
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class AIOutput {
@@ -23,5 +26,24 @@ public class AIOutput {
         this.maxMove = moveNum;
         this.gameResult = gameResult;
         this.moves = new ArrayList<>(moves);
+    }
+
+    static void save(ArrayList<String> summary) throws IOException {
+        // Records progress
+        FileWriter out = null;
+        try {
+            out = new FileWriter("TestOut.txt", true);
+            for (int i = 0; i < summary.size(); i++) {
+                out.write(summary.get(i) + "\r\n");
+            }
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } finally {
+            if (out != null) {
+                // Closes writer
+                out.close();
+            }
+        }
+        summary.clear();
     }
 }

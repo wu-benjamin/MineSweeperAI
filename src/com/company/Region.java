@@ -15,15 +15,15 @@ import java.util.ArrayList;
 
 public class Region {
     private ArrayList<Influence> members;
-    public Region() {
-        this.members = new ArrayList<>();
-    }
+    private boolean changed;
 
     Region(ArrayList<Influence> influences) {
+        this.changed = true;
         this.members = new ArrayList<>(influences);
     }
 
     Region(Influence inf) {
+        this.changed = true;
         ArrayList<Influence> members = new ArrayList<>();
         members.add(inf);
         this.members = members;
@@ -43,6 +43,14 @@ public class Region {
 
     void addAll(Region reg) {
         this.members.addAll(reg.members);
+    }
+
+    boolean getChanged() {
+        return this.changed;
+    }
+
+    void setChanged(boolean changed) {
+        this.changed = changed;
     }
 
     static boolean disjoint(Region a, Region b) {
@@ -128,6 +136,18 @@ public class Region {
                         return false;
                     }
                 }
+            }
+        }
+        return true;
+    }
+
+    static boolean equal(Region r1, Region r2) {
+        if (r1.members.size() != r2.members.size()) {
+            return false;
+        }
+        for (int i = 0; i < r1.members.size(); i++) {
+             if (!Influence.equal(r1.members.get(i), r2.members.get(i))) {
+                return false;
             }
         }
         return true;

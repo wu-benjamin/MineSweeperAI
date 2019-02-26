@@ -183,8 +183,8 @@ public class Board {
     }
 
     void paintComponent(Graphics2D g) {
-        //String prob;
-        //DecimalFormat df = new DecimalFormat("#.##");
+        String prob;
+        DecimalFormat df = new DecimalFormat("#.##");
         if (dead) {
             g.setColor(Color.BLACK);
             g.drawString("D", 0, 20);
@@ -250,13 +250,13 @@ public class Board {
                                 Main.getUnitCellSize(), Main.getUnitCellSize(), false);
                     }
                 }
-                //prob = df.format(AI.getMineProbabilities()[i][j]);
+                prob = df.format(AI.getMineProbabilities()[i][j]);
                 if (mines[i][j]) {
                     g.setColor(Color.WHITE);
                 } else {
                     g.setColor(Color.BLACK);
                 }
-                //g.drawString(prob, 20 + j * Main.getUnitCellSize(), 10 + (i + 1) * Main.getUnitCellSize());
+                g.drawString(prob, 20 + j * Main.getUnitCellSize(), 10 + (i + 1) * Main.getUnitCellSize());
             }
         }
         for (int i = 0; i < height; i++) {

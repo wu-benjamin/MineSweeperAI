@@ -18,4 +18,19 @@ class Influence {
     Coordinate getInfluencer() {
         return this.unswept;
     }
+
+    static boolean equal(Influence i1, Influence i2) {
+         if (!Coordinate.same(i1.unswept, i2.unswept)) {
+             return false;
+         }
+         if (i1.adjSwept.size() != i2.adjSwept.size()) {
+             return false;
+         }
+         for (int i = 0; i < i1.adjSwept.size(); i++) {
+             if (!Coordinate.same(i1.adjSwept.get(i), i2.adjSwept.get(i))) {
+                 return false;
+             }
+         }
+         return true;
+    }
 }
