@@ -15,7 +15,7 @@ public class Main extends JPanel implements Runnable {
     static final boolean AUTO = true;
     static final int AUTO_TIME = 250;
     static final boolean STEP_BY_STEP = !AUTO;
-    private static final int ITERATIONS = 1000;
+    private static final int ITERATIONS = 5;
 
     private static Board board;
     // Ensure WIDTH >= HEIGHT for cleaner display;
@@ -92,13 +92,14 @@ public class Main extends JPanel implements Runnable {
                 }
             }
         } else {
+            Runtime.getRuntime().addShutdownHook(new TestCloseMessage());
             addTests();
             JPanel testPanel = new JPanel();
             frame.setVisible(true);
             frame.setSize(WINDOW_SIZE + 20, WINDOW_SIZE * HEIGHT / WIDTH + 20);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setResizable(false);
-            testPanel.setPreferredSize(new Dimension(400, 350));
+            testPanel.setPreferredSize(new Dimension(650, 350));
             testPanel.setFocusable(true);
             testPanel.setDoubleBuffered(true);
             frame.setBackground(Color.BLACK);
@@ -116,6 +117,10 @@ public class Main extends JPanel implements Runnable {
             testPanel.add(progress2);
             testPanel.add(labelProgress3);
             testPanel.add(progress3);
+            testPanel.add(labelProgress4);
+            testPanel.add(progress4);
+            testPanel.add(labelProgress5);
+            testPanel.add(progress5);
             progress1.setMaximum(tests.size());
             progress1.setMinimum(0);
             progress2.setMaximum(ITERATIONS);
@@ -128,8 +133,8 @@ public class Main extends JPanel implements Runnable {
             progress3.setValue(0);
             progress4.setValue(0);
             progress5.setValue(0);
-            Main.labelProgress4.setText("Regions simulated 0 of 0");
-            Main.labelProgress5.setText("Arrangement 0 of 0");
+            Main.labelProgress4.setText("   Regions simulated 0 of 0");
+            Main.labelProgress5.setText("   Arrangement 0 of 0");
             int validTry;
             int success;
             int invalidTry;
@@ -231,6 +236,24 @@ public class Main extends JPanel implements Runnable {
                 }
             }
         }
+        System.exit(0);
+    }
+
+    public static void save() throws IOException {
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter("TestOut.txt", true);
+            DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+            LocalDateTime now = LocalDateTime.now();
+            writer.write("Tests ended: " + dtf.format(now) + "\r\n\r\n");
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (writer != null) {
+                // Closes writer
+                writer.close();
+            }
+        }
     }
 
     public static double calculateSD(double numArray[])
@@ -257,5 +280,16 @@ public class Main extends JPanel implements Runnable {
         }
 
         return Math.sqrt(standardDeviation/length);
+    }
+
+    static  class TestCloseMessage extends Thread {
+        @Override
+        public void run() {
+            try {
+                save();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
     }
 }

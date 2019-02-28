@@ -186,10 +186,10 @@ class AI {
                 getRegions();
                 //System.out.println(numChangedRegions());
                 //System.out.println("Size: " + regions.size());
-                Main.progress4.setMaximum(regions.size());
-                Main.progress4.setValue(0);
                 int numChanged = numChangedRegions();
-                Main.labelProgress4.setText("Regions simulated 0 of " + numChanged);
+                Main.progress4.setMaximum(numChanged);
+                Main.progress4.setValue(0);
+                Main.labelProgress4.setText("   Regions simulated 0 of " + numChanged);
                 int simulatedCount = 0;
                 Main.progress4.setValue(simulatedCount);
                 for (int i = 0; i < regions.size(); i++) {
@@ -198,7 +198,7 @@ class AI {
                         if (!simulateMineProbabilityRegion(regions.get(i), false)) {
                             randomSim = true;
                         }
-                        Main.labelProgress4.setText("Regions simulated " + simulatedCount + " of " + numChanged);
+                        Main.labelProgress4.setText("   Regions simulated " + simulatedCount + " of " + numChanged);
                         Main.progress4.setValue(simulatedCount);
                     }
                 }
@@ -206,9 +206,9 @@ class AI {
                 //System.out.println("Endgame");
                 Main.progress4.setMaximum(1);
                 Main.progress4.setValue(0);
-                Main.labelProgress4.setText("Regions simulated 0 of 1");
+                Main.labelProgress4.setText("   Regions simulated 0 of 1");
                 simulateMineProbabilityRegion(getSuperRegion(), true);
-                Main.labelProgress4.setText("Regions simulated 1 of 1");
+                Main.labelProgress4.setText("   Regions simulated 1 of 1");
                 Main.progress4.setValue(1);
             }
             boolean toReturn = false;
@@ -268,10 +268,11 @@ class AI {
             validMineCount[i] = 0;
             regionalMine[i] = true;
         }
+        Main.labelProgress5.setText("   Arrangement " + 0 + " of " + 0);
+        Main.progress5.setValue(0);
         if (Math.pow(2, reg.size()) > SIMULATIONS_MAX) { // Random Simulate
             Random rand = new Random();
-            Main.labelProgress5.setText("Arrangement " + 0 + " of " + SIMULATIONS_MAX);
-            Main.progress5.setValue(0);
+            Main.labelProgress5.setText("   Arrangement " + 0 + " of " + SIMULATIONS_MAX);
             Main.progress5.setMaximum(Integer.MAX_VALUE);
             for (long i = 0; i < SIMULATIONS_MAX; i++) {
                 for (int j = 0; j < regionalMine.length; j++) {
@@ -285,8 +286,8 @@ class AI {
                         }
                     }
                 }
-                Main.progress5.setValue((int)(i / SIMULATIONS_MAX) * Integer.MAX_VALUE);
-                Main.labelProgress5.setText("Arrangement " + i + " of " + SIMULATIONS_MAX);
+                Main.progress5.setValue((int)(((double)i / (double)SIMULATIONS_MAX) * (double)Integer.MAX_VALUE));
+                Main.labelProgress5.setText("   Arrangement " + i + " of " + SIMULATIONS_MAX);
             }
             //System.out.println(validConfigs + "*");
 
@@ -308,10 +309,9 @@ class AI {
             }
             return false;
         } else {
+            Main.labelProgress5.setText("   Arrangement " + 0 + " of " + (long) Math.pow(2, reg.size()));
+            Main.progress5.setMaximum(Integer.MAX_VALUE);
             for (long i = 0; i < (long) Math.pow(2, reg.size()); i++) {
-                Main.labelProgress5.setText("Arrangement " + 0 + " of " + (long) Math.pow(2, reg.size()));
-                Main.progress5.setValue(0);
-                Main.progress5.setMaximum(Integer.MAX_VALUE);
                 regionalMine = regionMineArrangement(regionalMine, i);
                 if (Region.valid(reg, regionalMine)) {
                     if (endGame) {
@@ -333,8 +333,8 @@ class AI {
                         }
                     }
                 }
-                Main.progress5.setValue((int)(i / (long) Math.pow(2, reg.size())) * Integer.MAX_VALUE);
-                Main.labelProgress5.setText("Arrangement " + i + " of " + (long) Math.pow(2, reg.size()));
+                Main.progress5.setValue((int)(((double)i / Math.pow(2, reg.size())) * (double)Integer.MAX_VALUE));
+                Main.labelProgress5.setText("   Arrangement " + i + " of " + (long) Math.pow(2, reg.size()));
             }
             //System.out.println(validConfigs);
             for (int i = 0; i < reg.size(); i++) {

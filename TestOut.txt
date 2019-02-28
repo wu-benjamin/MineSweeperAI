@@ -64,4 +64,5 @@ Marked 28.620733249051835 mines in a valid try on average with standard deviatio
 Probability of success in a valid try: 0.08217446270543616
 Time of test: 2019/02/28 06:41:09
 
+Tests ended: 2019/02/28 06:41:09
 
