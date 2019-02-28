@@ -10,7 +10,6 @@ class AI {
     private static boolean[][] suspectedMine;
     private static double[][] probabilityMine;
     private static final boolean DISCARD_DEATH_TURN_ONE = true; // Discounts turn one deaths from win rate in AIOutput
-    private static final int AUTO_TIME = 250;
     private static final int PREFERRED_COORDINATE = 3;
     private static double newProbability;
     private static double lowestProb;
@@ -22,7 +21,7 @@ class AI {
     private static boolean changed;
     private static boolean randomSim;
     private static final int MIN_NP_NQ = 10;
-    private static final int MAX_DETERMINED_SIM_REGION = 20; // Must be less than 63 with current implementation
+    static final int MAX_DETERMINED_SIM_REGION = 20; // Must be less than 63 with current implementation
     private static final long SIMULATIONS_MAX = (long) Math.pow(2, MAX_DETERMINED_SIM_REGION) + 1;
     private static ArrayList<Region> regions = new ArrayList<>();
 
@@ -33,7 +32,7 @@ class AI {
         probabilityMine = new double[Board.getHeight()][Board.getWidth()];
         suspectedMine = new boolean[Board.getHeight()][Board.getWidth()];
         try {
-            if (Main.AUTO && !Main.isTesting()) {
+            if (Main.AUTO && !Main.TEST) {
                 try {
                     Thread.sleep(2000);
                 } catch (Exception e) {
@@ -54,13 +53,13 @@ class AI {
             ArrayList<Coordinate> adj;
             Scanner key = new Scanner(System.in);
             while (!Board.endGame()) {
-                if (!Main.isTesting()) {
+                if (!Main.TEST) {
                     if (Main.STEP_BY_STEP) {
                         key.nextInt();
                     }
                     if (Main.AUTO) {
                         try {
-                            Thread.sleep(AUTO_TIME);
+                            Thread.sleep(Main.AUTO_TIME);
                         } catch (Exception e) {
                             e.printStackTrace();
                         }
@@ -127,18 +126,6 @@ class AI {
                         }
                     }
                 }
-                if (!Main.isTesting()) {
-                    if (Main.STEP_BY_STEP) {
-                        key.nextInt();
-                    }
-                    if (Main.AUTO) {
-                        try {
-                            Thread.sleep(AUTO_TIME);
-                        } catch (Exception e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
                 //System.out.println("Cycle: " + numSwept);
                 if (sweepVoid()) {
                     changed = true;
@@ -194,46 +181,35 @@ class AI {
         }
         if (lowestProb > 0.0 + EPSILON) {
             //System.out.println("getRegion");
-            Scanner key = new Scanner(System.in);
-            if (!Main.isTesting()) {
-                if (Main.STEP_BY_STEP) {
-                    key.nextInt();
-                }
-                if (Main.AUTO) {
-                    try {
-                        Thread.sleep(AUTO_TIME);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
             if (Board.getHeight() * Board.getWidth() - numSusMines - numSwept
                     > (long) Math.ceil(Math.log(SIMULATIONS_MAX) / Math.log(2.0))) {
                 getRegions();
                 //System.out.println(numChangedRegions());
                 //System.out.println("Size: " + regions.size());
+                Main.progress4.setMaximum(regions.size());
+                Main.progress4.setValue(0);
+                int numChanged = numChangedRegions();
+                Main.labelProgress4.setText("Regions simulated 0 of " + numChanged);
+                int simulatedCount = 0;
+                Main.progress4.setValue(simulatedCount);
                 for (int i = 0; i < regions.size(); i++) {
                     if (regions.get(i).getChanged()) {
+                        simulatedCount++;
                         if (!simulateMineProbabilityRegion(regions.get(i), false)) {
                             randomSim = true;
                         }
+                        Main.labelProgress4.setText("Regions simulated " + simulatedCount + " of " + numChanged);
+                        Main.progress4.setValue(simulatedCount);
                     }
                 }
             } else {
                 //System.out.println("Endgame");
+                Main.progress4.setMaximum(1);
+                Main.progress4.setValue(0);
+                Main.labelProgress4.setText("Regions simulated 0 of 1");
                 simulateMineProbabilityRegion(getSuperRegion(), true);
-            }
-            if (!Main.isTesting()) {
-                if (Main.STEP_BY_STEP) {
-                    key.nextInt();
-                }
-                if (Main.AUTO) {
-                    try {
-                        Thread.sleep(AUTO_TIME);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
+                Main.labelProgress4.setText("Regions simulated 1 of 1");
+                Main.progress4.setValue(1);
             }
             boolean toReturn = false;
             for (int i = 0; i < Board.getHeight(); i++) {
@@ -284,7 +260,6 @@ class AI {
 
     // Returns true if certain, otherwise returns false
     private static boolean simulateMineProbabilityRegion(Region reg, boolean endGame) {
-        Scanner key = new Scanner(System.in);
         //System.out.println("sim");
         int validConfigs = 0;
         boolean[] regionalMine = new boolean[reg.size()];
@@ -293,21 +268,12 @@ class AI {
             validMineCount[i] = 0;
             regionalMine[i] = true;
         }
-        if (!Main.isTesting()) {
-            if (Main.STEP_BY_STEP) {
-                key.nextInt();
-            }
-            if (Main.AUTO) {
-                try {
-                    Thread.sleep(AUTO_TIME);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
         if (Math.pow(2, reg.size()) > SIMULATIONS_MAX) { // Random Simulate
             Random rand = new Random();
-            for (int i = 0; i < SIMULATIONS_MAX; i++) {
+            Main.labelProgress5.setText("Arrangement " + 0 + " of " + SIMULATIONS_MAX);
+            Main.progress5.setValue(0);
+            Main.progress5.setMaximum(Integer.MAX_VALUE);
+            for (long i = 0; i < SIMULATIONS_MAX; i++) {
                 for (int j = 0; j < regionalMine.length; j++) {
                     regionalMine[j] = rand.nextBoolean();
                 }
@@ -319,6 +285,8 @@ class AI {
                         }
                     }
                 }
+                Main.progress5.setValue((int)(i / SIMULATIONS_MAX) * Integer.MAX_VALUE);
+                Main.labelProgress5.setText("Arrangement " + i + " of " + SIMULATIONS_MAX);
             }
             //System.out.println(validConfigs + "*");
 
@@ -340,7 +308,10 @@ class AI {
             }
             return false;
         } else {
-            for (long i = 0; i < (int) Math.pow(2, reg.size()); i++) {
+            for (long i = 0; i < (long) Math.pow(2, reg.size()); i++) {
+                Main.labelProgress5.setText("Arrangement " + 0 + " of " + (long) Math.pow(2, reg.size()));
+                Main.progress5.setValue(0);
+                Main.progress5.setMaximum(Integer.MAX_VALUE);
                 regionalMine = regionMineArrangement(regionalMine, i);
                 if (Region.valid(reg, regionalMine)) {
                     if (endGame) {
@@ -362,6 +333,8 @@ class AI {
                         }
                     }
                 }
+                Main.progress5.setValue((int)(i / (long) Math.pow(2, reg.size())) * Integer.MAX_VALUE);
+                Main.labelProgress5.setText("Arrangement " + i + " of " + (long) Math.pow(2, reg.size()));
             }
             //System.out.println(validConfigs);
             for (int i = 0; i < reg.size(); i++) {

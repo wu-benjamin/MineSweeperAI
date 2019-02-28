@@ -1,36 +1,67 @@
+Tests began 2019/02/26 02:45:01
+
 Test Conditions: W * H, NUM_MINES: 9 * 9, 10
-Iterations: 10
-Number of invalid tries: 1
-Number of valid tries: 9
-Number of successful tries: 8
-Swept 63.77777777777778 tiles in a valid try on average with standard deviation 20.427529234278037
-Guessed 2.111111111111111 tiles in a valid try on average with standard deviation 1.6629588385661962
-Marked 8.88888888888889 mines in a valid try on average with standard deviation 0.0
-Probability of success in a valid try: 0.8888888888888888
-Time of test: 2019/02/26 01:52:03
+Iterations: 1000
+Max simulated region: 20
+Number of invalid tries: 123
+Number of valid tries: 877
+Number of successful tries: 653
+Swept 56.892816419612316 tiles in a valid try on average with standard deviation 27.190235787326525
+Guessed 2.709236031927024 tiles in a valid try on average with standard deviation 1.8541011856278622
+Marked 7.826681870011402 mines in a valid try on average with standard deviation 0.8451732170738757
+Probability of success in a valid try: 0.7445838084378563
+Time of test: 2019/02/26 03:10:19
 
 
 Test Conditions: W * H, NUM_MINES: 8 * 8, 10
-Iterations: 10
-Number of invalid tries: 0
-Number of valid tries: 10
-Number of successful tries: 8
-Swept 47.2 tiles in a valid try on average with standard deviation 13.862178760930766
-Guessed 4.4 tiles in a valid try on average with standard deviation 3.4409301068170506
-Marked 8.5 mines in a valid try on average with standard deviation 1.5713484026367726
-Probability of success in a valid try: 0.8
-Time of test: 2019/02/26 01:53:13
+Iterations: 1000
+Max simulated region: 20
+Number of invalid tries: 156
+Number of valid tries: 844
+Number of successful tries: 451
+Swept 34.75592417061611 tiles in a valid try on average with standard deviation 25.467055420636925
+Guessed 3.4135071090047395 tiles in a valid try on average with standard deviation 2.1573258564462168
+Marked 5.985781990521327 mines in a valid try on average with standard deviation 1.4813507841659117
+Probability of success in a valid try: 0.5343601895734598
+Time of test: 2019/02/26 04:07:50
 
 
 Test Conditions: W * H, NUM_MINES: 16 * 16, 40
-Iterations: 10
-Number of invalid tries: 1
-Number of valid tries: 9
-Number of successful tries: 4
-Swept 121.44444444444444 tiles in a valid try on average with standard deviation 104.10326603906334
-Guessed 3.4444444444444446 tiles in a valid try on average with standard deviation 2.247220505424423
-Marked 22.0 mines in a valid try on average with standard deviation 12.915322510706247
-Probability of success in a valid try: 0.4444444444444444
-Time of test: 2019/02/26 01:53:18
+Iterations: 1000
+Max simulated region: 20
+Number of invalid tries: 172
+Number of valid tries: 828
+Number of successful tries: 441
+Swept 147.1280193236715 tiles in a valid try on average with standard deviation 98.03896391408682
+Guessed 3.6497584541062804 tiles in a valid try on average with standard deviation 2.560467546474166
+Marked 26.533816425120772 mines in a valid try on average with standard deviation 12.765748841266538
+Probability of success in a valid try: 0.532608695652174
+Time of test: 2019/02/26 07:50:01
+
+
+Test Conditions: W * H, NUM_MINES: 24 * 24, 99
+Iterations: 1000
+Max simulated region: 20
+Number of invalid tries: 165
+Number of valid tries: 835
+Number of successful tries: 283
+Swept 272.63952095808384 tiles in a valid try on average with standard deviation 214.88228422033202
+Guessed 4.663473053892216 tiles in a valid try on average with standard deviation 3.032200733516071
+Marked 54.91017964071856 mines in a valid try on average with standard deviation 33.83470033643569
+Probability of success in a valid try: 0.3389221556886228
+Time of test: 2019/02/27 06:52:10
+
+
+Test Conditions: W * H, NUM_MINES: 30 * 16, 99
+Iterations: 1000
+Max simulated region: 20
+Number of invalid tries: 209
+Number of valid tries: 791
+Number of successful tries: 65
+Swept 122.4968394437421 tiles in a valid try on average with standard deviation 175.97640750964317
+Guessed 5.587863463969659 tiles in a valid try on average with standard deviation 3.986492066968149
+Marked 28.620733249051835 mines in a valid try on average with standard deviation 35.597655289782416
+Probability of success in a valid try: 0.08217446270543616
+Time of test: 2019/02/28 06:41:09
 
 

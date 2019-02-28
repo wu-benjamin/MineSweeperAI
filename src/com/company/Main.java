@@ -2,6 +2,8 @@ package com.company;
 
 import javax.swing.*;
 import java.awt.*;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -9,15 +11,11 @@ import java.util.ArrayList;
 
 public class Main extends JPanel implements Runnable {
 
-
-
-    private static final boolean TEST = true;
+    static final boolean TEST = true;
     static final boolean AUTO = true;
+    static final int AUTO_TIME = 250;
     static final boolean STEP_BY_STEP = !AUTO;
     private static final int ITERATIONS = 1000;
-
-
-
 
     private static Board board;
     // Ensure WIDTH >= HEIGHT for cleaner display;
@@ -32,10 +30,10 @@ public class Main extends JPanel implements Runnable {
     private static ArrayList<TestConditions> tests = new ArrayList<>();
     static JLabel labelProgress3 = new JLabel();
     static JProgressBar progress3 = new JProgressBar();
-
-    static boolean isTesting() {
-        return TEST;
-    }
+    static JLabel labelProgress4 = new JLabel();
+    static JProgressBar progress4 = new JProgressBar();
+    static JLabel labelProgress5 = new JLabel();
+    static JProgressBar progress5 = new JProgressBar();
 
     private static void addTests() {
         tests.add(new TestConditions(9, 9, 10));
@@ -66,7 +64,7 @@ public class Main extends JPanel implements Runnable {
         return WINDOW_SIZE / WIDTH;
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         if (!TEST) {
             frame.setVisible(true);
             frame.setSize(WINDOW_SIZE + 20, WINDOW_SIZE * HEIGHT / WIDTH + 20);
@@ -94,18 +92,19 @@ public class Main extends JPanel implements Runnable {
                 }
             }
         } else {
+            addTests();
             JPanel testPanel = new JPanel();
             frame.setVisible(true);
             frame.setSize(WINDOW_SIZE + 20, WINDOW_SIZE * HEIGHT / WIDTH + 20);
             frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             frame.setResizable(false);
-            testPanel.setPreferredSize(new Dimension(350, 200));
+            testPanel.setPreferredSize(new Dimension(400, 350));
             testPanel.setFocusable(true);
             testPanel.setDoubleBuffered(true);
             frame.setBackground(Color.BLACK);
             frame.add(testPanel);
             frame.pack();
-            GridLayout layout = new GridLayout(3, 2);
+            GridLayout layout = new GridLayout(5, 2);
             testPanel.setLayout(layout);
             JLabel labelProgress1 = new JLabel();
             JProgressBar progress1 = new JProgressBar();
@@ -122,6 +121,15 @@ public class Main extends JPanel implements Runnable {
             progress2.setMaximum(ITERATIONS);
             progress2.setMinimum(0);
             progress3.setMinimum(0);
+            progress4.setMinimum(0);
+            progress5.setMinimum(0);
+            progress1.setValue(0);
+            progress2.setValue(0);
+            progress3.setValue(0);
+            progress4.setValue(0);
+            progress5.setValue(0);
+            Main.labelProgress4.setText("Regions simulated 0 of 0");
+            Main.labelProgress5.setText("Arrangement 0 of 0");
             int validTry;
             int success;
             int invalidTry;
@@ -130,10 +138,23 @@ public class Main extends JPanel implements Runnable {
             int numMarkedMine;
             AIOutput out = new AIOutput();
             ArrayList<String> summary = new ArrayList<String>();
-            addTests();
             double[] swept = new double[ITERATIONS];
             double[] guessed = new double[ITERATIONS];
             double[] marked = new double[ITERATIONS];
+            FileWriter writer = null;
+            try {
+                writer = new FileWriter("TestOut.txt", true);
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+                writer.write("Tests began: " +  dtf.format(now) + "\r\n\r\n");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } finally {
+                if (writer != null) {
+                    // Closes writer
+                    writer.close();
+                }
+            }
             for (int testNum = 0; testNum < tests.size(); testNum++) {
                 labelProgress1.setText("   Test " + (testNum + 1) + " of " + tests.size());
                 progress1.setValue(testNum);
@@ -191,6 +212,7 @@ public class Main extends JPanel implements Runnable {
                 summary.add("Test Conditions: W * H, NUM_MINES: " + tests.get(testNum).getWidth() + " * "
                 + tests.get(testNum).getHeight() + ", " + tests.get(testNum).getNumMines());
                 summary.add("Iterations: " + ITERATIONS);
+                summary.add("Max simulated region: " + AI.MAX_DETERMINED_SIM_REGION);
                 summary.add("Number of invalid tries: " + invalidTry);
                 summary.add("Number of valid tries: " + validTry);
                 summary.add("Number of successful tries: " + success);
